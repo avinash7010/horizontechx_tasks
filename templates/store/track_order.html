@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Track Order | Northstar Store{% endblock %}
+{% block content %}
+<section class="container content-card">
+    <h1>Track Order</h1>
+    <form method="get" class="stack-form">
+        {{ form.as_p }}
+        <button class="button" type="submit">Track</button>
+    </form>
+    {% if order %}
+        <div class="track-result">
+            <p>Status: {{ order.get_status_display }}</p>
+            <p>Total: ${{ order.total_amount }}</p>
+            <a href="{% url 'store:order_detail' order.tracking_number %}">Open full order</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

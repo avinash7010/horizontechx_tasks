@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}My Orders | Northstar Store{% endblock %}
+{% block content %}
+<section class="container content-card">
+    <h1>My Orders</h1>
+    {% for order in orders %}
+        <article class="order-row">
+            <div>
+                <h2><a href="{% url 'store:order_detail' order.tracking_number %}">Order {{ order.tracking_number }}</a></h2>
+                <p>{{ order.get_status_display }}</p>
+            </div>
+            <strong>${{ order.total_amount }}</strong>
+        </article>
+    {% empty %}
+        <div class="empty-state">
+            <h2>No orders yet.</h2>
+            <p>Place an order to see it here.</p>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

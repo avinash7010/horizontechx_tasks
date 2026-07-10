@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} | Northstar Store{% endblock %}
+{% block content %}
+<section class="container product-detail">
+    <div class="detail-panel">
+        <div class="product-image large">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% elif product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="image-fallback">{{ product.name|slice:":1" }}</div>
+            {% endif %}
+        </div>
+        <div class="detail-copy">
+            <p class="eyebrow">{{ product.stock }} in stock</p>
+            <h1>{{ product.name }}</h1>
+            <p class="product-price">${{ product.price }}</p>
+            <p>{{ product.description }}</p>
+            <form method="post" action="{% url 'store:add_to_cart' product.id %}" class="inline-form">
+                {% csrf_token %}
+                <label>
+                    Quantity
+                    <input type="number" name="quantity" min="1" value="1">
+                </label>
+                <button class="button" type="submit">Add to cart</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

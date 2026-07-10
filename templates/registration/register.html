@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Register | Northstar Store{% endblock %}
+{% block content %}
+<section class="container content-card narrow">
+    <h1>Create account</h1>
+    <form method="post" class="stack-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="button" type="submit">Register</button>
+    </form>
+</section>
+{% endblock %}

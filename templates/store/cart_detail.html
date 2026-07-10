@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Cart | Northstar Store{% endblock %}
+{% block content %}
+<section class="container content-card">
+    <div class="card-header">
+        <h1>Your Cart</h1>
+        <a href="{% url 'store:product_list' %}">Continue shopping</a>
+    </div>
+
+    {% if items %}
+        <div class="cart-list">
+            {% for item in items %}
+                <article class="cart-item">
+                    <div>
+                        <h2><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></h2>
+                        <p>${{ item.product.price }} each</p>
+                    </div>
+                    <form method="post" action="{% url 'store:update_cart' item.product.id %}" class="cart-update-form">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" min="0" value="{{ item.quantity }}">
+                        <button class="button button-ghost" type="submit">Update</button>
+                        <a class="button button-danger" href="{% url 'store:remove_from_cart' item.product.id %}">Remove</a>
+                    </form>
+                    <strong>${{ item.line_total }}</strong>
+                </article>
+            {% endfor %}
+        </div>
+        <div class="cart-summary">
+            <p>Subtotal</p>
+            <strong>${{ subtotal }}</strong>
+        </div>
+        {% if user.is_authenticated %}
+            <a class="button" href="{% url 'store:checkout' %}">Proceed to checkout</a>
+        {% else %}
+            <a class="button" href="{% url 'login' %}">Login to checkout</a>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <h2>Your cart is empty.</h2>
+            <p>Add a product to get started.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

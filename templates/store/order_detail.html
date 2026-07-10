@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Order {{ order.tracking_number }} | Northstar Store{% endblock %}
+{% block content %}
+<section class="container content-card">
+    <h1>Order Tracking</h1>
+    <p><strong>Tracking number:</strong> {{ order.tracking_number }}</p>
+    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+    <p><strong>Total:</strong> ${{ order.total_amount }}</p>
+    <h2>Items</h2>
+    {% for item in order.items.all %}
+        <p>{{ item.product.name }} x {{ item.quantity }} - ${{ item.line_total }}</p>
+    {% endfor %}
+</section>
+{% endblock %}
