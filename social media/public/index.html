@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sphere - Reimagined Connection</title>
+  <!-- Google Fonts: Outfit (headings) & Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <!-- App Container (Shows when logged in) -->
+  <div id="app-container" class="app-layout hidden">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar-left">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <div class="logo-inner"></div>
+        </div>
+        <span class="brand-name">Sphere</span>
+      </div>
+
+      <nav class="sidebar-menu">
+        <button class="nav-item active" data-tab="feed">
+          <i data-lucide="home"></i>
+          <span>Home</span>
+        </button>
+        <button class="nav-item" data-tab="explore">
+          <i data-lucide="search"></i>
+          <span>Explore</span>
+        </button>
+        <button class="nav-item" id="sidebar-profile-btn" data-tab="profile">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      <button class="btn btn-primary btn-compose" id="compose-shortcut-btn">
+        <i data-lucide="plus"></i>
+        <span>New Post</span>
+      </button>
+
+      <!-- Current User Profile Widget -->
+      <div class="sidebar-user-widget" id="sidebar-user-card">
+        <img src="" alt="Avatar" class="user-avatar-sm" id="sidebar-avatar">
+        <div class="user-info-text">
+          <span class="user-display-name" id="sidebar-display-name">...</span>
+          <span class="user-username" id="sidebar-username">@...</span>
+        </div>
+        <button class="btn-logout" id="logout-btn" title="Logout">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT WINDOW -->
+    <main class="main-content">
+      
+      <!-- FEED VIEW -->
+      <section id="view-feed" class="content-view active">
+        <header class="view-header">
+          <h2>Home</h2>
+        </header>
+
+        <!-- Feed Creation Card -->
+        <div class="compose-card glass-panel">
+          <img src="" alt="Avatar" class="user-avatar-sm" id="compose-avatar">
+          <form id="create-post-form" class="compose-form">
+            <textarea placeholder="What's happening in your sphere?" id="post-content-input" rows="3" required></textarea>
+            
+            <!-- Optional Media URL Input Panel -->
+            <div class="media-input-panel hidden" id="media-input-panel">
+              <input type="url" placeholder="Paste image URL (https://...)" id="post-media-input">
+              <button type="button" class="btn-remove-media" id="btn-remove-media">
+                <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+              </button>
+            </div>
+
+            <div class="compose-actions">
+              <button type="button" class="btn-icon" id="btn-toggle-media" title="Add image URL">
+                <i data-lucide="image"></i>
+                <span class="action-label">Image URL</span>
+              </button>
+              <button type="submit" class="btn btn-primary btn-submit-post">
+                <span>Post</span>
+                <i data-lucide="send" style="width: 14px; height: 14px; margin-left: 4px;"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Feed Filters -->
+        <div class="feed-filters">
+          <button class="filter-tab active" data-feed="global">Global Feed</button>
+          <button class="filter-tab" data-feed="following" id="following-feed-tab">Following</button>
+        </div>
+
+        <!-- Posts Timeline -->
+        <div class="posts-timeline" id="posts-container">
+          <!-- Dynamically populated -->
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <span>Exploring the sphere...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPLORE/SEARCH VIEW -->
+      <section id="view-explore" class="content-view">
+        <header class="view-header">
+          <h2>Explore</h2>
+        </header>
+        
+        <div class="search-container glass-panel">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" placeholder="Search creators, hashtags, or posts..." id="search-input">
+          <button class="btn btn-primary" id="search-submit-btn">Search</button>
+        </div>
+
+        <div class="explore-results" id="search-results-section">
+          <!-- Initial prompt/suggestions -->
+          <div class="explore-initial-state" id="explore-default-prompt">
+            <div class="explore-hero glass-panel">
+              <h3>Discover Sphere Creators</h3>
+              <p>Search for keywords, usernames, or posts above to discover fresh perspectives in the network.</p>
+            </div>
+          </div>
+
+          <!-- Dynamic search results containers -->
+          <div class="search-results-layout hidden" id="search-results-layout">
+            <div class="search-column">
+              <h4>Creators</h4>
+              <div class="users-list-grid" id="search-users-result">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+            
+            <div class="search-column">
+              <h4>Posts Matching Content</h4>
+              <div class="posts-timeline" id="search-posts-result">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFILE VIEW -->
+      <section id="view-profile" class="content-view">
+        <div class="profile-header-banner" id="profile-banner-container">
+          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80" alt="Cover" class="profile-cover-img" id="profile-cover-pic">
+          <div class="profile-banner-overlay"></div>
+          <button class="btn-back-feed" id="profile-back-btn">
+            <i data-lucide="arrow-left"></i>
+          </button>
+        </div>
+
+        <div class="profile-info-section glass-panel">
+          <div class="profile-avatar-row">
+            <img src="" alt="Profile Avatar" class="profile-avatar-lg" id="profile-avatar-pic">
+            <div class="profile-actions-wrapper">
+              <button class="btn btn-outline" id="edit-profile-btn" style="display: none;">
+                <i data-lucide="edit-3" style="width: 14px; height: 14px; margin-right: 4px;"></i>
+                Edit Profile
+              </button>
+              <button class="btn btn-primary" id="follow-profile-btn" style="display: none;">
+                Follow
+              </button>
+            </div>
+          </div>
+
+          <div class="profile-text-details">
+            <h2 class="profile-name" id="profile-display-name">...</h2>
+            <span class="profile-username" id="profile-username">@...</span>
+            <p class="profile-bio" id="profile-bio-text">No bio yet.</p>
+            
+            <div class="profile-meta-row">
+              <div class="meta-item">
+                <i data-lucide="calendar"></i>
+                <span id="profile-joined-date">Joined ...</span>
+              </div>
+            </div>
+
+            <div class="profile-stats-row">
+              <div class="stat-item" id="stats-followers-btn">
+                <span class="stat-val" id="profile-followers-count">0</span>
+                <span class="stat-lbl">Followers</span>
+              </div>
+              <div class="stat-item" id="stats-following-btn">
+                <span class="stat-val" id="profile-following-count">0</span>
+                <span class="stat-lbl">Following</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val" id="profile-posts-count">0</span>
+                <span class="stat-lbl">Posts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab layout for profile feeds -->
+        <div class="profile-feed-header">
+          <h3>Activity Feed</h3>
+        </div>
+        <div class="posts-timeline" id="profile-posts-container">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar-right">
+      <!-- Search Trigger Box -->
+      <div class="sidebar-search-trigger glass-panel" id="right-sidebar-search-trigger">
+        <i data-lucide="search"></i>
+        <span>Search Sphere...</span>
+      </div>
+
+      <!-- Who to Follow -->
+      <div class="widget-panel glass-panel">
+        <h3 class="widget-title">Who to Follow</h3>
+        <div class="suggestions-list" id="suggestions-container">
+          <!-- Dynamically populated -->
+          <div class="loading-state-sm">
+            <div class="spinner-sm"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trending Sphere Info -->
+      <div class="widget-panel glass-panel">
+        <h3 class="widget-title">Trending in Sphere</h3>
+        <div class="trending-topics">
+          <div class="trend-item">
+            <span class="trend-tag">#glassmorphism</span>
+            <span class="trend-posts">1.2k posts</span>
+          </div>
+          <div class="trend-item">
+            <span class="trend-tag">#webdev</span>
+            <span class="trend-posts">954 posts</span>
+          </div>
+          <div class="trend-item">
+            <span class="trend-tag">#cssglowing</span>
+            <span class="trend-posts">412 posts</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- AUTH SCREEN (Shows when logged out) -->
+  <div id="auth-container" class="auth-layout">
+    <div class="auth-brand-section">
+      <div class="auth-brand-content animate-fade-in">
+        <div class="brand-logo-large">
+          <div class="logo-inner-large"></div>
+        </div>
+        <h1 class="auth-title">Sphere</h1>
+        <p class="auth-subtitle">Step into a new dimension of connection. Showcase your digital self, comment on trends, and grow your circle in a fluid, high-fidelity ecosystem.</p>
+        
+        <div class="hero-stats">
+          <div class="hero-stat-card glass-panel">
+            <h4>Fluid UX</h4>
+            <p>Transitions & Micro-animations</p>
+          </div>
+          <div class="hero-stat-card glass-panel">
+            <h4>Glassmorphism</h4>
+            <p>Premium dark-mode visuals</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-card-section">
+      <!-- LOGIN CARD -->
+      <div class="auth-card glass-panel active" id="login-card">
+        <h2 class="auth-card-title">Welcome Back</h2>
+        <p class="auth-card-subtitle">Connect to access your personal feed.</p>
+        
+        <div class="error-banner hidden" id="login-error-banner"></div>
+
+        <form id="login-form" class="auth-form">
+          <div class="form-group">
+            <label for="login-username">Username or Email</label>
+            <div class="input-wrapper">
+              <i data-lucide="user"></i>
+              <input type="text" id="login-username" placeholder="alex_vibe" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <div class="input-wrapper">
+              <i data-lucide="lock"></i>
+              <input type="password" id="login-password" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-auth">
+            <span>Log In</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </form>
+
+        <p class="auth-switch-text">
+          New to the Sphere? <button type="button" class="btn-text-link" id="switch-to-register-btn">Create Account</button>
+        </p>
+      </div>
+
+      <!-- REGISTER CARD -->
+      <div class="auth-card glass-panel" id="register-card">
+        <h2 class="auth-card-title">Join the Sphere</h2>
+        <p class="auth-card-subtitle">Build your custom digital profile today.</p>
+
+        <div class="error-banner hidden" id="register-error-banner"></div>
+
+        <form id="register-form" class="auth-form">
+          <div class="form-group">
+            <label for="register-username">Username</label>
+            <div class="input-wrapper">
+              <i data-lucide="at-sign"></i>
+              <input type="text" id="register-username" placeholder="alex_vibe" required maxlength="20" pattern="^[a-zA-Z0-9_]+$">
+            </div>
+            <span class="input-help">Only letters, numbers, and underscores.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="register-email">Email Address</label>
+            <div class="input-wrapper">
+              <i data-lucide="mail"></i>
+              <input type="email" id="register-email" placeholder="alex@sphere.net" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="register-displayname">Display Name</label>
+            <div class="input-wrapper">
+              <i data-lucide="user"></i>
+              <input type="text" id="register-displayname" placeholder="Alex Mercer" required maxlength="30">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <div class="input-wrapper">
+              <i data-lucide="lock"></i>
+              <input type="password" id="register-password" placeholder="••••••••" required minlength="6">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-auth">
+            <span>Sign Up</span>
+            <i data-lucide="user-plus"></i>
+          </button>
+        </form>
+
+        <p class="auth-switch-text">
+          Already a member? <button type="button" class="btn-text-link" id="switch-to-login-btn">Log In</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT PROFILE -->
+  <div class="modal-overlay hidden" id="edit-profile-modal">
+    <div class="modal-card glass-panel animate-zoom-in">
+      <div class="modal-header">
+        <h3>Edit Profile Settings</h3>
+        <button class="btn-close-modal" id="edit-profile-close-btn">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="edit-profile-form" class="modal-form">
+        <div class="form-group">
+          <label for="edit-display-name">Display Name</label>
+          <input type="text" id="edit-display-name" required maxlength="30">
+        </div>
+        <div class="form-group">
+          <label for="edit-bio">Bio</label>
+          <textarea id="edit-bio" rows="3" maxlength="160" placeholder="Tell the sphere about yourself..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-avatar-url">Avatar Image URL</label>
+          <input type="url" id="edit-avatar-url" placeholder="https://images.unsplash.com/photo-...">
+        </div>
+        <div class="form-group">
+          <label for="edit-cover-url">Cover Banner URL</label>
+          <input type="url" id="edit-cover-url" placeholder="https://images.unsplash.com/photo-...">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="edit-profile-cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FOLLOWERS/FOLLOWING LIST -->
+  <div class="modal-overlay hidden" id="connections-modal">
+    <div class="modal-card glass-panel animate-zoom-in">
+      <div class="modal-header">
+        <h3 id="connections-modal-title">Connections</h3>
+        <button class="btn-close-modal" id="connections-close-btn">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body-list" id="connections-list-container">
+        <!-- Dynamically populated list of users -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Client-side JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
